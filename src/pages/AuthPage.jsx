@@ -9,9 +9,10 @@ export default function AuthPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleOpen = () => setShow(true);
+  // Possible values: null (no modal shows), "Login", "SignUp"
+  const [modalShow, setModalShow] = useState(null);
+  const handleShowSignUp = () => setModalShow("SignUp");
+  const handleShowLogin = () => setModalShow("Login");
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -23,6 +24,19 @@ export default function AuthPage() {
       console.error(error);
     }
   };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post(`${url}/login`, { username, password });
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleClose = () => setModalShow(null);
 
   return (
     <Row className="gx-0">
@@ -43,7 +57,7 @@ export default function AuthPage() {
             <i className="bi bi-apple"></i> Sign up with Apple
           </Button>
           <p className="text-center">or</p>
-          <Button className="rounded-pill" onClick={handleOpen}>
+          <Button className="rounded-pill" onClick={handleShowSignUp}>
             Create an account
           </Button>
           <p style={{ fontSize: 12 }}>
@@ -53,14 +67,30 @@ export default function AuthPage() {
           <p className="mt-5 fw-bold">
             Already have an account?
           </p>
-          <Button className="rounded-pill" variant="outline-primary">Sign In</Button>
+          <Button
+            className="rounded-pill"
+            variant="outline-primary"
+            onClick={handleShowLogin}
+          >
+            Sign In
+          </Button>
         </Col>
-        <Modal show={show} onHide={handleClose} centered>
+        <Modal
+          show={modalShow !== null}
+          onHide={handleClose}
+          animation={false}
+          centered
+        >
           <Modal.Body>
             <h2 className="mb-4 fw-bold">
-              Create your account
+              {modalShow === "SignUp"
+                ? "Create your account"
+                : "Log in to your account"}
             </h2>
-            <Form className="d-grid gap-2 px-5" onSubmit={handleSignUp}>
+            <Form
+              className="d-grid gap-2 px-5"
+              onSubmit={modalShow === "SignUp" ? handleSignUp : handleLogin}
+            >
               <Form.Group className="mb-3" controlId="email">
                 <Form.Control
                   onChange={(e) => setUsername(e.target.value)}
@@ -85,7 +115,7 @@ export default function AuthPage() {
               </p>
 
               <Button className="rounded-pill" type="submit">
-                Sign Up
+                {modalShow === "SignUp" ? "Sign Up" : "Log In"}
               </Button>
             </Form>
           </Modal.Body>
