@@ -1,6 +1,7 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Col, Form, Image, Modal, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import useLocalStorage from "use-local-storage";
 
 export default function AuthPage() {
@@ -11,11 +12,18 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
 
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");
+  const navigate = useNavigate();
 
   // Possible values: null (no modal shows), "Login", "SignUp"
   const [modalShow, setModalShow] = useState(null);
   const handleShowSignUp = () => setModalShow("SignUp");
   const handleShowLogin = () => setModalShow("Login");
+
+  useEffect(() => {
+    if (authToken) {
+      navigate("/profile");
+    }
+  }, [authToken, navigate]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
