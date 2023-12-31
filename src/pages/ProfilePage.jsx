@@ -1,8 +1,22 @@
+import { useEffect } from "react";
 import { Button, Container, Navbar } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useLocalStorage from "use-local-storage";
 
 export default function ProfilePage() {
-  const handleLogout = () => { };
+  const [authToken, setAuthToken] = useLocalStorage("authToken", "");
+  const navigate = useNavigate();
+
+  // Check for authToken immediately upon component mount and whenever authToken changes
+  useEffect(() => {
+    if (!authToken) {
+      navigate("/login"); // Redirect to login if no authToken is present
+    }
+  }, [authToken, navigate]);
+
+  const handleLogout = () => {
+    setAuthToken(""); // Clear token from localStorage
+  };
 
   return (
     <>
