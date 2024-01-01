@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Col, Form, Image, Modal, Row } from "react-bootstrap";
+import { Button, Col, Form, Image, Modal, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import useLocalStorage from "use-local-storage";
 
@@ -10,6 +10,8 @@ export default function AuthPage() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [responseMessage, setResponseMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");
   const navigate = useNavigate();
@@ -27,17 +29,75 @@ export default function AuthPage() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    setResponseMessage("");
+    setIsLoading(true);
+
+    if (!username || !password) {
+      setResponseMessage("Please fill up all field.");
+      setIsLoading(false);
+
+      return;
+    }
+
+    const usernameRe = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
+
+    if (!usernameRe.test(username)) {
+      setResponseMessage("Invalid email");
+      setIsLoading(false);
+
+      return;
+    }
+
+    const passwordRe = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[1-9])(?=.*[?.*!@#$%^&,(){}\-_+=<>/|`~\\:;]).{8,32}$/;
+
+    if (!passwordRe.test(password)) {
+      setResponseMessage(`
+        Password needs at least 8 characters length
+        Password needs at least 1 uppercase letter (A...Z)
+        Password needs at least 1 lowercase letter (a...z)
+        Password needs at least 1 number (0...9)
+        Password needs at least 1 special symbol (!...$)`);
+      setIsLoading(false);
+
+      return;
+    }
 
     try {
       const res = await axios.post(`${url}/signup`, { username, password });
       console.log(res.data);
+
+      setIsLoading(false);
+      handleClose();
+      setTimeout(() => {
+        handleShowLogin();
+      }, 100);
     } catch (error) {
       console.error(error);
+      if (error.response && error.response.status === 400) {
+        setResponseMessage(error.response.data.message);
+        setIsLoading(false);
+      }
+      else if (error.response && error.response.status === 500) {
+        setResponseMessage(error.response.data.error);
+        setIsLoading(false);
+      }
+      else {
+        setResponseMessage(error.message);
+        setIsLoading(false);
+      }
     }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+
+    if (!username || !password) {
+      setResponseMessage("Please fill up all field.");
+      setIsLoading(false);
+
+      return;
+    }
 
     try {
       const res = await axios.post(`${url}/login`, { username, password });
@@ -48,10 +108,28 @@ export default function AuthPage() {
       }
     } catch (error) {
       console.error(error);
+      if (error.response && error.response.status === 400) {
+        setResponseMessage("Username or password incorrect");
+        setIsLoading(false);
+      }
+      else if (error.response && error.response.status === 500) {
+        setResponseMessage(error.response.data.error);
+        setIsLoading(false);
+      }
+      else {
+        setResponseMessage(error.message);
+        setIsLoading(false);
+      }
     }
   };
 
-  const handleClose = () => setModalShow(null);
+  const handleClose = () => {
+    setUsername("");
+    setPassword("");
+    setResponseMessage("");
+    setIsLoading(false);
+    setModalShow(null);
+  };
 
   return (
     <Row className="gx-0">
@@ -121,16 +199,44 @@ export default function AuthPage() {
                   type="password"
                 />
               </Form.Group>
-              <p style={{ fontSize: 12 }}>
-                By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use.
-                Luna Tweets may use your contact information, including your email address and phone number
-                for purposes outlined in our Privacy Policy, like keeping you account secure and personalising
-                our services, including ads. Learn more. Others will be able to find you by email or phone
-                number, when provided, unless you choose otherwise here.
-              </p>
+              {responseMessage &&
+                <div className="text-danger mb-3">
+                  {responseMessage.indexOf("\n") !== -1
+                    ? <ul className="mb-0" style={{ paddingInlineStart: 20 }}>
+                      {responseMessage.split("\n").map((message, index) =>
+                        message && <li key={index}>{message}</li>
+                      )}
+                    </ul>
+                    : responseMessage}
+                </div>
+              }
+              {modalShow === "SignUp" &&
+                <p style={{ fontSize: 12 }}>
+                  By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie Use.
+                  Luna Tweets may use your contact information, including your email address and phone number
+                  for purposes outlined in our Privacy Policy, like keeping you account secure and personalising
+                  our services, including ads. Learn more. Others will be able to find you by email or phone
+                  number, when provided, unless you choose otherwise here.
+                </p>
+              }
 
-              <Button className="rounded-pill" type="submit">
-                {modalShow === "SignUp" ? "Sign Up" : "Log In"}
+              <Button className="rounded-pill" type={!isLoading ? "" : "submit"}>
+                {isLoading
+                  ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        className="me-2"
+                        role="status"
+                        size="sm"
+                      />
+                      <span>Loading...</span>
+                    </>
+                  )
+                  : (
+                    modalShow === "SignUp" ? "Sign Up" : "Log In"
+                  )}
               </Button>
             </Form>
           </Modal.Body>
