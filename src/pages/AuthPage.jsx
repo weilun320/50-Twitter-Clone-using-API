@@ -29,9 +29,12 @@ export default function AuthPage() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    // Clear any error message
     setResponseMessage("");
+    // Set button to loading stage to prevent user clicking when signup being processed
     setIsLoading(true);
 
+    // Ensure user fill up all field
     if (!username || !password) {
       setResponseMessage("Please fill up all field.");
       setIsLoading(false);
@@ -39,6 +42,7 @@ export default function AuthPage() {
       return;
     }
 
+    // Regex for email
     const usernameRe = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
 
     if (!usernameRe.test(username)) {
@@ -48,6 +52,7 @@ export default function AuthPage() {
       return;
     }
 
+    // Regex for password
     const passwordRe = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[1-9])(?=.*[?.*!@#$%^&,(){}\-_+=<>/|`~\\:;]).{8,32}$/;
 
     if (!passwordRe.test(password)) {
@@ -67,12 +72,14 @@ export default function AuthPage() {
       console.log(res.data);
 
       setIsLoading(false);
+      // Close signup modal and show login modal
       handleClose();
       setTimeout(() => {
         handleShowLogin();
       }, 100);
     } catch (error) {
       console.error(error);
+      // Set error message from API
       if (error.response && error.response.status === 400) {
         setResponseMessage(error.response.data.message);
         setIsLoading(false);
@@ -90,8 +97,12 @@ export default function AuthPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    // Clear any error message
+    setResponseMessage("");
+    // Set button to loading stage to prevent user clicking when signup being processed
     setIsLoading(true);
 
+    // Ensure user fill up all field
     if (!username || !password) {
       setResponseMessage("Please fill up all field.");
       setIsLoading(false);
@@ -108,6 +119,7 @@ export default function AuthPage() {
       }
     } catch (error) {
       console.error(error);
+      // Set error message from API
       if (error.response && error.response.status === 400) {
         setResponseMessage("Username or password incorrect");
         setIsLoading(false);
@@ -123,6 +135,7 @@ export default function AuthPage() {
     }
   };
 
+  // Reset all states when closing modal
   const handleClose = () => {
     setUsername("");
     setPassword("");
