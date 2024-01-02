@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Button, Container, Navbar } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Container, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import useLocalStorage from "use-local-storage";
 import ProfileEditModal from "../components/ProfileEditModal";
+import ProfileSideBar from "../components/ProfileSideBar";
 
 export default function ProfilePage() {
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");
@@ -24,25 +25,10 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Navbar bg="light" expand="md">
-        <Container>
-          <Navbar.Brand as={Link} to="/">
-            <i
-              className="bi bi-twitter"
-              style={{ fontSize: 30, color: "dodgerblue" }}
-            ></i>
-          </Navbar.Brand>
-          <Navbar.Collapse className="justify-content-end">
-            <Button variant="primary" onClick={handleLogout}>
-              Logout
-            </Button>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-
       <Container className="mt-3">
-        <h2>Your profile</h2>
-        <Button onClick={() => setShow(true)}>Edit Profile</Button>
+        <Row>
+          <ProfileSideBar handleLogout={handleLogout} />
+        </Row>
       </Container>
       <ProfileEditModal show={show} handleClose={handleClose} />
     </>
