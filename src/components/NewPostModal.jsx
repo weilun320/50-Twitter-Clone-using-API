@@ -1,36 +1,16 @@
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { savePost } from "../features/posts/postsSlice";
 
 export default function NewPostModal({ show, handleClose }) {
   const [postContent, setPostContent] = useState("");
+  const dispatch = useDispatch();
 
   const handleSave = () => {
-    // Get stored JWT Token
-    const token = localStorage.getItem("authToken");
-
-    // Decode the token to fetch user ID
-    const decodedToken = jwtDecode(token);
-    const userId = decodedToken.id; // May change depending on how the server encode the token
-
-    // Prepare data to be sent
-    const data = {
-      title: "Post Title", // Add functionality to set this properly
-      content: postContent,
-      user_id: userId,
-    };
-
-    // Make API call
-    axios
-      .post("https://twitter-api-weilun9320.sigma-school-full-stack.repl.co/posts", data)
-      .then((res) => {
-        console.log("Success: ", res.data);
-        handleClose();
-      })
-      .catch((error) => {
-        console.error("Error: ", error);
-      });
+    dispatch(savePost(postContent));
+    handleClose();
+    setPostContent("");
   };
 
   return (
