@@ -1,7 +1,8 @@
 import { Button, Col, Image, Nav, Row } from "react-bootstrap";
 import ProfilePostCard from "./ProfilePostCard";
 import ProfileEditModal from "./ProfileEditModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 export default function ProfileMidBody() {
   const url = "https://pbs.twimg.com/profile_banners/83072625/1602845571/1500x500";
@@ -9,6 +10,26 @@ export default function ProfileMidBody() {
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
+
+  const [posts, setPosts] = useState([]);
+
+  // Fetch posts based on user ID
+  const fetchPosts = (userId) => {
+    fetch(`https://twitter-api-weilun9320.sigma-school-full-stack.repl.co/posts/user/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setPosts(data))
+      .catch((error) => console.error("Error: ", error));
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.id;
+      fetchPosts(userId);
+    }
+  }, []);
 
   return (
     <>
@@ -70,7 +91,9 @@ export default function ProfileMidBody() {
             <Nav.Link eventKey="link-4">Likes</Nav.Link>
           </Nav.Item>
         </Nav>
-        <ProfilePostCard />
+        {posts.length > 0 && posts.map((post) => (
+          <ProfilePostCard key={post.id} content={post.content} />
+        ))}
       </Col>
       <ProfileEditModal show={show} handleClose={handleClose} />
     </>
