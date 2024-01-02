@@ -1,11 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button, Container, Navbar } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import useLocalStorage from "use-local-storage";
+import ProfileEditModal from "../components/ProfileEditModal";
 
 export default function ProfilePage() {
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");
   const navigate = useNavigate();
+
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
 
   // Check for authToken immediately upon component mount and whenever authToken changes
   useEffect(() => {
@@ -38,7 +42,9 @@ export default function ProfilePage() {
 
       <Container className="mt-3">
         <h2>Your profile</h2>
+        <Button onClick={() => setShow(true)}>Edit Profile</Button>
       </Container>
+      <ProfileEditModal show={show} handleClose={handleClose} />
     </>
   );
 }
