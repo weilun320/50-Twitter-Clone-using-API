@@ -10,6 +10,7 @@ export default function ProfileMidBody() {
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const [posts, setPosts] = useState([]);
 
@@ -53,7 +54,7 @@ export default function ProfileMidBody() {
             <Button
               className="rounded-pill mt-2"
               variant="outline-secondary"
-              onClick={() => setShow(true)}
+              onClick={handleShow}
             >
               Edit Profile
             </Button>
