@@ -22,7 +22,7 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Container className="mt-3">
+      <Container>
         <Row>
           <ProfileSideBar handleLogout={handleLogout} />
           <ProfileMidBody />
