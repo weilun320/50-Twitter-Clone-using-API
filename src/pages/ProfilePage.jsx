@@ -1,16 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Container, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import useLocalStorage from "use-local-storage";
-import ProfileEditModal from "../components/ProfileEditModal";
 import ProfileSideBar from "../components/ProfileSideBar";
+import ProfileMidBody from "../components/ProfileMidBody";
 
 export default function ProfilePage() {
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");
   const navigate = useNavigate();
-
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
 
   // Check for authToken immediately upon component mount and whenever authToken changes
   useEffect(() => {
@@ -28,9 +25,9 @@ export default function ProfilePage() {
       <Container className="mt-3">
         <Row>
           <ProfileSideBar handleLogout={handleLogout} />
+          <ProfileMidBody />
         </Row>
       </Container>
-      <ProfileEditModal show={show} handleClose={handleClose} />
     </>
   );
 }
