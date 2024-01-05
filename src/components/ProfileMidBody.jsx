@@ -6,6 +6,8 @@ import { jwtDecode } from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPostsByUser } from "../features/posts/postsSlice";
 import { fetchUserDetails } from "../features/users/usersSlice";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileMidBody() {
   const url = "https://pbs.twimg.com/profile_banners/83072625/1602845571/1500x500";
@@ -23,18 +25,43 @@ export default function ProfileMidBody() {
   const userLoading = useSelector((state) => state.users.loading);
 
   const [username, setUsername] = useState("");
+  const [follower, setFollower] = useState(0);
+  const [following, setFollowing] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
 
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      const userId = decodedToken.id;
-      setUsername(decodedToken.username);
-      dispatch(fetchPostsByUser(userId));
-      dispatch(fetchUserDetails(userId));
+    if (!token) {
+      navigate("/login");
+      return;
     }
-  }, [dispatch]);
+    else {
+      try {
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.id;
+        setUsername(decodedToken.username);
+        dispatch(fetchPostsByUser(userId));
+        dispatch(fetchUserDetails(userId));
+
+        const fetchFollowers = async () => {
+          try {
+            const res = await axios.get(`${BASE_URL}/users/follows/${userId}`);
+
+            setFollower(res.data.follower);
+            setFollowing(res.data.following);
+          } catch (error) {
+            console.error(error);
+          }
+        };
+
+        fetchFollowers();
+      } catch (error) {
+        navigate("/login");
+      }
+    }
+  }, [dispatch, navigate]);
 
   return (
     <>
@@ -89,13 +116,13 @@ export default function ProfileMidBody() {
               @{userDetails ? userDetails.username : username.split("@")[0]}
             </p>
 
-            <p>{userDetails && userDetails.bio}</p>
+            <p className="mb-2" style={{ fontSize: 15 }}>{userDetails && userDetails.bio}</p>
+
+            <p>
+              <strong>{following}</strong> Following <strong> {follower}</strong> Followers
+            </p>
           </>
         )}
-
-        <p>
-          <strong>271</strong> Following <strong> 610</strong> Followers
-        </p>
 
         <Nav variant="underline" defaultActiveKey="/home" justify>
           <Nav.Item>

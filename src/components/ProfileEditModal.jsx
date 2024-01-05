@@ -22,10 +22,6 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
-  const token = localStorage.getItem("authToken");
-  const decode = jwtDecode(token);
-  const userId = decode.id;
-
   useEffect(() => {
     if (userDetails) {
       setUsername(userDetails.username ? userDetails.username : "");
@@ -110,6 +106,9 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
       return;
     }
 
+    const token = localStorage.getItem("authToken");
+    const decode = jwtDecode(token);
+    const userId = decode.id;
     const data = { username, name, bio, profileImage: profileImageFile, bannerImage: bannerImageFile };
 
     try {
