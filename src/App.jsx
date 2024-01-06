@@ -7,6 +7,7 @@ import { Container, Row } from "react-bootstrap";
 import ProfileSideBar from "./components/ProfileSideBar";
 import useLocalStorage from "use-local-storage";
 import { useEffect } from "react";
+import UsersToFollowPage from "./pages/UsersToFollowPage";
 
 export function Layout() {
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");
@@ -47,6 +48,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/profile" />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/connect_people" element={<UsersToFollowPage />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="*" element={<AuthPage />} />
           </Route>
