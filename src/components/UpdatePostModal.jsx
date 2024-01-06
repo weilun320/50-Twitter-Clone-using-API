@@ -1,11 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { fetchPostsByUser } from "../features/posts/postsSlice";
 
 export default function UpdatePostModal({ show, handleClose, userId, post, BASE_URL }) {
   const [postContent, setPostContent] = useState("");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -15,13 +16,19 @@ export default function UpdatePostModal({ show, handleClose, userId, post, BASE_
   }, [post]);
 
   const handleUpdatePost = () => {
+    setLoading(true);
+
     axios.put(`${BASE_URL}/posts/${post.id}`, { ...post, content: postContent })
       .then((res) => {
         console.log(res.data);
         dispatch(fetchPostsByUser(userId));
         handleClose();
+        setLoading(false);
       })
-      .catch((error) => console.error("Error: ", error));
+      .catch((error) => {
+        console.error("Error: ", error);
+        setLoading(false);
+      });
   };
 
   return (
@@ -44,10 +51,20 @@ export default function UpdatePostModal({ show, handleClose, userId, post, BASE_
       <Modal.Footer>
         <Button
           className="rounded-pill"
-          onClick={handleUpdatePost}
+          onClick={loading ? null : handleUpdatePost}
           variant="primary"
         >
-          Save
+          {loading ? (
+            <>
+              <Spinner
+                animation="border"
+                as="span"
+                className="me-2"
+                size="sm"
+              />
+              <span>Loading...</span>
+            </>
+          ) : "Save"}
         </Button>
       </Modal.Footer>
     </Modal>
