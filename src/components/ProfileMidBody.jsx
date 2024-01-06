@@ -142,7 +142,7 @@ export default function ProfileMidBody() {
         {loading && (
           <Spinner animation="border" className="ms-3 mt-3" variant="primary" />
         )}
-        {posts.length > 0 && [...posts].reverse().map((post) => (
+        {posts.length > 0 && posts.map((post) => (
           <ProfilePostCard key={post.id} post={post} userDetails={userDetails} />
         ))}
       </Col>
