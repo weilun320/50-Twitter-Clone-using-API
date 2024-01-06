@@ -8,9 +8,18 @@ const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.t
 export const fetchPostsByUser = createAsyncThunk(
   "posts/fetchByUser",
   async (userId) => {
-    const res = await fetch(`${BASE_URL}/posts/user/${userId}`);
+    try {
+      const res = await fetch(`${BASE_URL}/posts/user/${userId}`);
 
-    return res.json();
+      if (res.ok) {
+        return res.json();
+      }
+      else {
+        return [];
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+    }
   }
 );
 
@@ -31,7 +40,7 @@ export const savePost = createAsyncThunk(
 
     return res.data;
   }
-)
+);
 
 // Slice
 const postsSlice = createSlice({
@@ -44,7 +53,7 @@ const postsSlice = createSlice({
       state.loading = false;
     }),
       builder.addCase(savePost.fulfilled, (state, action) => {
-        state.posts = [action.payload, ...state.posts];
+        state.posts = [...state.posts, action.payload];
       });
   },
 });
