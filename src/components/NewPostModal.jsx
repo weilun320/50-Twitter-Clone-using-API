@@ -8,6 +8,10 @@ export default function NewPostModal({ show, handleClose }) {
   const dispatch = useDispatch();
 
   const handleSave = () => {
+    if (!postContent) {
+      return;
+    }
+
     dispatch(savePost(postContent));
     handleClose();
     setPostContent("");
