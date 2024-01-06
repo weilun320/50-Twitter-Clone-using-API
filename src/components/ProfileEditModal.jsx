@@ -164,7 +164,7 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
           <span className="fw-bold fs-4">Edit Profile</span>
           <Button
             className="fw-semibold rounded-pill"
-            type="submit"
+            type={isLoading ? "" : "submit"}
             variant="primary ms-auto"
           >
             {isLoading ? (

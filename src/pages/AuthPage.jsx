@@ -233,7 +233,7 @@ export default function AuthPage() {
                 </p>
               }
 
-              <Button className="rounded-pill" type={!isLoading ? "" : "submit"}>
+              <Button className="rounded-pill" type={isLoading ? "" : "submit"}>
                 {isLoading
                   ? (
                     <>
