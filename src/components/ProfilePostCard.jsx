@@ -8,43 +8,52 @@ export default function ProfilePostCard({ post, userDetails }) {
   const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.teams.replit.dev";
 
   const [likes, setLikes] = useState([]);
-
-  const createdAt = new Date(post.created_at);
-  const currentDate = new Date();
-  const timeDifference = Math.abs(currentDate - createdAt) / (1000 * 60 * 60);
-  let postCreatedAt = "";
-
-  if (createdAt.getFullYear() !== new Date().getFullYear()) {
-    // Post created year is not current year
-    postCreatedAt = `${createdAt.toLocaleString("default", { month: "short" })} ${createdAt.getDate()}, ${createdAt.getFullYear()}`;
-  }
-  else if (timeDifference >= 24) {
-    // Post created time is more than 1 day
-    postCreatedAt = `${createdAt.toLocaleString("default", { month: "short" })} ${createdAt.getDate()}`;
-  }
-  else if (timeDifference >= 1) {
-    // Post created time is more than 60 minutes
-    postCreatedAt = `${Math.floor(timeDifference)}h`;
-  }
-  else if (Math.floor(timeDifference * 60) === 0) {
-    // Post created time less than 1 minute
-    postCreatedAt = "Just now";
-  }
-  else {
-    // Post created time more than 1 minute but less than 60 minutes
-    postCreatedAt = `${Math.floor(timeDifference * 60)}m`;
-  }
+  const [postCreatedAt, setPostCreatedAt] = useState("");
 
   // Decoding to get the user ID
   const token = localStorage.getItem("authToken");
   const decode = jwtDecode(token);
   const userId = decode.id;
 
+
   useEffect(() => {
     fetch(`${BASE_URL}/likes/post/${post.id}`)
       .then((res) => res.json())
       .then((data) => setLikes(data))
       .catch((error) => console.error("Error: ", error));
+
+    const getPostCreatedTime = () => {
+      const createdAt = new Date(post.created_at);
+      const currentDate = new Date();
+      const timeDifference = Math.abs(currentDate - createdAt) / (1000 * 60 * 60);
+
+      if (createdAt.getFullYear() !== new Date().getFullYear()) {
+        // Post created year is not current year
+        setPostCreatedAt(`${createdAt.toLocaleString("default", { month: "short" })} ${createdAt.getDate()}, ${createdAt.getFullYear()}`);
+      }
+      else if (timeDifference >= 24) {
+        // Post created time is more than 1 day
+        setPostCreatedAt(`${createdAt.toLocaleString("default", { month: "short" })} ${createdAt.getDate()}`);
+      }
+      else if (timeDifference >= 1) {
+        // Post created time is more than 60 minutes
+        setPostCreatedAt(`${Math.floor(timeDifference)}h`);
+      }
+      else if (Math.floor(timeDifference * 60) === 0) {
+        // Post created time less than 1 minute
+        setPostCreatedAt("Just now");
+      }
+      else {
+        // Post created time more than 1 minute but less than 60 minutes
+        setPostCreatedAt(`${Math.floor(timeDifference * 60)}m`);
+      }
+    };
+
+    getPostCreatedTime();
+
+    const intervalId = setInterval(getPostCreatedTime, 60000);
+
+    return () => clearInterval(intervalId);
   }, [post]);
 
   const isLiked = likes.some((like) => like.user_id === userId);
@@ -99,9 +108,9 @@ export default function ProfilePostCard({ post, userDetails }) {
       </Col>
 
       <Col>
-        <strong>{userDetails ? userDetails.name : decode.username.split("@")[0]}</strong>
+        <strong>{userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}</strong>
         <span className="text-secondary ms-1">
-          @{userDetails ? userDetails.username : decode.username.split("@")[0]} • {postCreatedAt}
+          @{userDetails && userDetails.username ? userDetails.username : userDetails && userDetails.email.split("@")[0]} • {postCreatedAt}
         </span>
         <p>{post.content}</p>
         <div className="d-flex justify-content-between">
