@@ -112,7 +112,7 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
     const data = { username, name, bio, profileImage: profileImageFile, bannerImage: bannerImageFile };
 
     try {
-      const res = await axios.post(`${BASE_URL}/users/profile/${userId}`, data, {
+      const res = await axios.post(`${BASE_URL}/profile/${userId}`, data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -6,7 +6,7 @@ const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.t
 export const fetchUserDetails = createAsyncThunk(
   "users/fetchDetails",
   async (userId) => {
-    const res = await fetch(`${BASE_URL}/users/profile/${userId}`);
+    const res = await fetch(`${BASE_URL}/profile/${userId}`);
 
     return res.json();
   }

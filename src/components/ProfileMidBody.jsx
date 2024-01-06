@@ -21,10 +21,9 @@ export default function ProfileMidBody() {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
   const loading = useSelector((state) => state.posts.loading);
-  const userDetails = useSelector((state) => state.users.userDetails && state.users.userDetails.message ? null : state.users.userDetails);
+  const userDetails = useSelector((state) => state.users.userDetails);
   const userLoading = useSelector((state) => state.users.loading);
 
-  const [username, setUsername] = useState("");
   const [follower, setFollower] = useState(0);
   const [following, setFollowing] = useState(0);
 
@@ -41,13 +40,12 @@ export default function ProfileMidBody() {
       try {
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.id;
-        setUsername(decodedToken.username);
         dispatch(fetchPostsByUser(userId));
         dispatch(fetchUserDetails(userId));
 
         const fetchFollowers = async () => {
           try {
-            const res = await axios.get(`${BASE_URL}/users/follows/${userId}`);
+            const res = await axios.get(`${BASE_URL}/follows/count/${userId}`);
 
             setFollower(res.data.follower);
             setFollowing(res.data.following);
@@ -109,11 +107,11 @@ export default function ProfileMidBody() {
         ) : (
           <>
             <p className="mt-5 fw-bold" style={{ margin: 0 }}>
-              {userDetails ? userDetails.name : username.split("@")[0]}
+              {userDetails && userDetails.name ? userDetails.name : userDetails.email.split("@")[0]}
             </p>
 
             <p className="text-secondary" style={{ fontSize: 15 }}>
-              @{userDetails ? userDetails.username : username.split("@")[0]}
+              @{userDetails && userDetails.username ? userDetails.username : userDetails.email.split("@")[0]}
             </p>
 
             <p className="mb-2" style={{ fontSize: 15 }}>{userDetails && userDetails.bio}</p>
