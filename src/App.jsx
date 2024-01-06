@@ -8,6 +8,7 @@ import ProfileSideBar from "./components/ProfileSideBar";
 import useLocalStorage from "use-local-storage";
 import { useEffect } from "react";
 import UsersToFollowPage from "./pages/UsersToFollowPage";
+import "./App.css";
 
 export function Layout() {
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");

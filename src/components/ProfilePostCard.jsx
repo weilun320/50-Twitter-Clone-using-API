@@ -1,7 +1,8 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
-import { Button, Col, Row } from "react-bootstrap";
+import { Button, Col, Dropdown, Row } from "react-bootstrap";
+import DeletePostModal from "./DeletePostModal";
 
 export default function ProfilePostCard({ post, userDetails }) {
   const pic = "https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg";
@@ -10,11 +11,14 @@ export default function ProfilePostCard({ post, userDetails }) {
   const [likes, setLikes] = useState([]);
   const [postCreatedAt, setPostCreatedAt] = useState("");
 
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   // Decoding to get the user ID
   const token = localStorage.getItem("authToken");
   const decode = jwtDecode(token);
   const userId = decode.id;
-
 
   useEffect(() => {
     fetch(`${BASE_URL}/likes/post/${post.id}`)
@@ -86,56 +90,79 @@ export default function ProfilePostCard({ post, userDetails }) {
   };
 
   return (
-    <Row
-      className="p-3"
-      style={{
-        borderTop: "1px solid #D3D3D3",
-        borderBottom: "1px solid #D3D3D3"
-      }}
-    >
-      <Col sm={1} className="px-0">
-        <div className="rounded-circle mx-auto" style={{
-          backgroundBlendMode: "multiply",
-          backgroundColor: "#ccc",
-          backgroundImage: userDetails && userDetails.profileImage && `url(${BASE_URL}/${userDetails.profileImage})`,
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          height: 40,
-          width: 40,
-        }}>
-        </div>
-      </Col>
+    <>
+      <Row
+        className="p-3"
+        style={{
+          borderTop: "1px solid #D3D3D3",
+          borderBottom: "1px solid #D3D3D3"
+        }}
+      >
+        <Col sm={1} className="px-0">
+          <div className="rounded-circle mx-auto" style={{
+            backgroundBlendMode: "multiply",
+            backgroundColor: "#ccc",
+            backgroundImage: userDetails && userDetails.profileImage && `url(${BASE_URL}/${userDetails.profileImage})`,
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            height: 40,
+            width: 40,
+          }}>
+          </div>
+        </Col>
 
-      <Col>
-        <strong>{userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}</strong>
-        <span className="text-secondary ms-1">
-          @{userDetails && userDetails.username ? userDetails.username : userDetails && userDetails.email.split("@")[0]} • {postCreatedAt}
-        </span>
-        <p>{post.content}</p>
-        <div className="d-flex justify-content-between">
-          <Button variant="light">
-            <i className="bi bi-chat"></i>
-          </Button>
-          <Button variant="light">
-            <i className="bi bi-repeat"></i>
-          </Button>
-          <Button variant="light" onClick={handleLike}>
-            {isLiked ? (
-              <i className="bi bi-heart-fill text-danger me-2"></i>
-            ) : (
-              <i className="bi bi-heart me-2"></i>
-            )}
-            {likes.length}
-          </Button>
-          <Button variant="light">
-            <i className="bi bi-graph-up"></i>
-          </Button>
-          <Button variant="light">
-            <i className="bi bi-upload"></i>
-          </Button>
-        </div>
-      </Col>
-    </Row>
+        <Col>
+          <div className="d-flex justify-content-between align-items-center">
+            <p className="mb-0">
+              <strong>{userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}</strong>
+              <span className="text-secondary ms-1">
+                @{userDetails && userDetails.username ? userDetails.username : userDetails && userDetails.email.split("@")[0]} • {postCreatedAt}
+              </span>
+            </p>
+            <Dropdown align="end">
+              <Dropdown.Toggle variant="light">
+                <i className="bi bi-three-dots"></i>
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item>Edit</Dropdown.Item>
+                <Dropdown.Item onClick={handleShow}>Delete</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+          <p>{post.content}</p>
+          <div className="d-flex justify-content-between">
+            <Button variant="light">
+              <i className="bi bi-chat"></i>
+            </Button>
+            <Button variant="light">
+              <i className="bi bi-repeat"></i>
+            </Button>
+            <Button variant="light" onClick={handleLike}>
+              {isLiked ? (
+                <i className="bi bi-heart-fill text-danger me-2"></i>
+              ) : (
+                <i className="bi bi-heart me-2"></i>
+              )}
+              {likes.length}
+            </Button>
+            <Button variant="light">
+              <i className="bi bi-graph-up"></i>
+            </Button>
+            <Button variant="light">
+              <i className="bi bi-upload"></i>
+            </Button>
+          </div>
+        </Col>
+      </Row>
+      <DeletePostModal
+        show={show}
+        handleClose={handleClose}
+        userId={userId}
+        postId={post.id}
+        BASE_URL={BASE_URL}
+      />
+    </>
   );
 }
