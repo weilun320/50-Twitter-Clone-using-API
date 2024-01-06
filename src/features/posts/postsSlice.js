@@ -53,7 +53,7 @@ const postsSlice = createSlice({
       state.loading = false;
     }),
       builder.addCase(savePost.fulfilled, (state, action) => {
-        state.posts = [...state.posts, action.payload];
+        state.posts = [action.payload, ...state.posts];
       });
   },
 });
