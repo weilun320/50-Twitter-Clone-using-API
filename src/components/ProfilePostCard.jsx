@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { Button, Col, Dropdown, Row } from "react-bootstrap";
 import DeletePostModal from "./DeletePostModal";
+import UpdatePostModal from "./UpdatePostModal";
 
 export default function ProfilePostCard({ post, userDetails }) {
   const pic = "https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg";
@@ -10,10 +11,17 @@ export default function ProfilePostCard({ post, userDetails }) {
 
   const [likes, setLikes] = useState([]);
   const [postCreatedAt, setPostCreatedAt] = useState("");
+  const [modal, setModal] = useState("");
 
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleClose = () => {
+    setShow(false);
+    setModal("");
+  };
+  const handleShow = (action) => {
+    setShow(true);
+    setModal(action);
+  };
 
   // Decoding to get the user ID
   const token = localStorage.getItem("authToken");
@@ -126,8 +134,8 @@ export default function ProfilePostCard({ post, userDetails }) {
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item>Edit</Dropdown.Item>
-                <Dropdown.Item onClick={handleShow}>Delete</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleShow("edit")}>Edit</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleShow("delete")}>Delete</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           </div>
@@ -156,13 +164,23 @@ export default function ProfilePostCard({ post, userDetails }) {
           </div>
         </Col>
       </Row>
-      <DeletePostModal
-        show={show}
-        handleClose={handleClose}
-        userId={userId}
-        postId={post.id}
-        BASE_URL={BASE_URL}
-      />
+      {modal === "edit" ? (
+        <UpdatePostModal
+          show={show}
+          handleClose={handleClose}
+          userId={userId}
+          post={post}
+          BASE_URL={BASE_URL}
+        />
+      ) : (
+        <DeletePostModal
+          show={show}
+          handleClose={handleClose}
+          userId={userId}
+          postId={post.id}
+          BASE_URL={BASE_URL}
+        />
+      )}
     </>
   );
 }
