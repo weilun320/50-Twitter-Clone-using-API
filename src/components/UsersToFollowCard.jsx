@@ -3,8 +3,6 @@ import { Button, Col, Row, Spinner } from "react-bootstrap";
 import axios from "axios";
 
 export default function UsersToFollowCard({ userId, currentUserId }) {
-  const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.teams.replit.dev";
-
   const [isFollowed, setIsFollowed] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -12,7 +10,7 @@ export default function UsersToFollowCard({ userId, currentUserId }) {
   useEffect(() => {
     const fetchUserDetails = async () => {
       setLoading(true)
-      fetch(`${BASE_URL}/profile/${userId}`)
+      fetch(`${process.env.BASE_URL}/profile/${userId}`)
         .then((res) => res.json())
         .then((data) => {
           setUserDetails(data);
@@ -30,7 +28,7 @@ export default function UsersToFollowCard({ userId, currentUserId }) {
   const handleFollow = () => isFollowed ? removeFromFollows() : addToFollows();
 
   const addToFollows = () => {
-    axios.post(`${BASE_URL}/follows`, {
+    axios.post(`${process.env.BASE_URL}/follows`, {
       user_id: currentUserId,
       following_user_id: userId,
     })
@@ -42,7 +40,7 @@ export default function UsersToFollowCard({ userId, currentUserId }) {
 
   const removeFromFollows = () => {
     if (isFollowed) {
-      axios.put(`${BASE_URL}/follows/${currentUserId}/${userId}`)
+      axios.put(`${process.env.BASE_URL}/follows/${currentUserId}/${userId}`)
         .then(() => {
           setIsFollowed(false);
         })
@@ -66,7 +64,7 @@ export default function UsersToFollowCard({ userId, currentUserId }) {
             <div className="rounded-circle mx-auto" style={{
               backgroundBlendMode: "multiply",
               backgroundColor: "#ccc",
-              backgroundImage: userDetails && userDetails.profileImage && `url(${BASE_URL}/${userDetails.profileImage})`,
+              backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage})`,
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
               backgroundSize: "cover",

@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom";
 import UsersToFollowCard from "../components/UsersToFollowCard";
 
 export default function UsersToFollowPage() {
-  const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.teams.replit.dev";
-
   const navigate = useNavigate();
   const [notFollowing, setNotFollowing] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -25,7 +23,7 @@ export default function UsersToFollowPage() {
 
         const fetchNotFollowingUser = async () => {
           try {
-            const res = await fetch(`${BASE_URL}/follows/${userId}`);
+            const res = await fetch(`${process.env.BASE_URL}/follows/${userId}`);
             const data = await res.json();
 
             setNotFollowing(data);

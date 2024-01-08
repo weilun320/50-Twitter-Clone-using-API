@@ -2,14 +2,12 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.teams.replit.dev";
-
 // Async thunk for fetching a user's posts
 export const fetchPostsByUser = createAsyncThunk(
   "posts/fetchByUser",
   async (userId) => {
     try {
-      const res = await fetch(`${BASE_URL}/posts/user/${userId}`);
+      const res = await fetch(`${process.env.BASE_URL}/posts/user/${userId}`);
 
       if (res.ok) {
         return res.json();
@@ -36,7 +34,7 @@ export const savePost = createAsyncThunk(
       user_id: userId,
     };
 
-    const res = await axios.post(`${BASE_URL}/posts`, data);
+    const res = await axios.post(`${process.env.BASE_URL}/posts`, data);
 
     return res.data;
   }

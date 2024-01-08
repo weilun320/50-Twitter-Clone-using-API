@@ -1,12 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.teams.replit.dev";
-
 // Async thunk for fetching specific user's details
 export const fetchUserDetails = createAsyncThunk(
   "users/fetchDetails",
   async (userId) => {
-    const res = await fetch(`${BASE_URL}/profile/${userId}`);
+    const res = await fetch(`${process.env.BASE_URL}/profile/${userId}`);
 
     return res.json();
   }

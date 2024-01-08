@@ -6,8 +6,6 @@ import { useDispatch } from "react-redux";
 import { fetchUserDetails } from "../features/users/usersSlice";
 
 export default function ProfileEditModal({ show, handleClose, userDetails }) {
-  const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.teams.replit.dev";
-
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -112,7 +110,7 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
     const data = { username, name, bio, profileImage: profileImageFile, bannerImage: bannerImageFile };
 
     try {
-      const res = await axios.post(`${BASE_URL}/profile/${userId}`, data, {
+      const res = await axios.post(`${process.env.BASE_URL}/profile/${userId}`, data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -186,7 +184,7 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
           <div className="position-relative w-100" style={{
             backgroundBlendMode: "multiply",
             backgroundColor: "#ccc",
-            backgroundImage: bannerImage && isBannerImageUploaded ? bannerImage && `url(${bannerImage})` : userDetails && userDetails.bannerImage && `url(${BASE_URL}/${bannerImage})`,
+            backgroundImage: bannerImage && isBannerImageUploaded ? bannerImage && `url(${bannerImage})` : userDetails && userDetails.bannerImage && `url(${process.env.BASE_URL}/${bannerImage})`,
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
@@ -212,7 +210,7 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
             <div className="position-absolute rounded-circle" style={{
               backgroundBlendMode: "multiply",
               backgroundColor: "#ccc",
-              backgroundImage: profileImage && isProfileImageUploaded ? profileImage && `url(${profileImage})` : userDetails && userDetails.profileImage && `url(${BASE_URL}/${profileImage})`,
+              backgroundImage: profileImage && isProfileImageUploaded ? profileImage && `url(${profileImage})` : userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${profileImage})`,
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
               backgroundSize: "cover",

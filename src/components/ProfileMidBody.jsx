@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 export default function ProfileMidBody() {
   const url = "https://pbs.twimg.com/profile_banners/83072625/1602845571/1500x500";
   const pic = "https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg";
-  const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.teams.replit.dev";
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -45,7 +44,7 @@ export default function ProfileMidBody() {
 
         const fetchFollowers = async () => {
           try {
-            const res = await axios.get(`${BASE_URL}/follows/count/${userId}`);
+            const res = await axios.get(`${process.env.BASE_URL}/follows/count/${userId}`);
 
             setFollower(res.data.follower);
             setFollowing(res.data.following);
@@ -67,7 +66,7 @@ export default function ProfileMidBody() {
         <div className="position-relative w-100" style={{
           backgroundBlendMode: "multiply",
           backgroundColor: "#ccc",
-          backgroundImage: userDetails && userDetails.bannerImage && `url(${BASE_URL}/${userDetails.bannerImage})`,
+          backgroundImage: userDetails && userDetails.bannerImage && `url(${process.env.BASE_URL}/${userDetails.bannerImage})`,
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
@@ -78,7 +77,7 @@ export default function ProfileMidBody() {
         <div className="position-absolute rounded-circle" style={{
           backgroundBlendMode: "multiply",
           backgroundColor: "#ccc",
-          backgroundImage: userDetails && userDetails.profileImage && `url(${BASE_URL}/${userDetails.profileImage})`,
+          backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage})`,
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
@@ -143,7 +142,7 @@ export default function ProfileMidBody() {
           <Spinner animation="border" className="ms-3 mt-3" variant="primary" />
         )}
         {posts.length > 0 && posts.map((post) => (
-          <ProfilePostCard key={post.id} post={post} userDetails={userDetails} />
+          <ProfilePostCard key={post.id} post={post} />
         ))}
       </Col>
       <ProfileEditModal show={show} handleClose={handleClose} userDetails={userDetails} />
