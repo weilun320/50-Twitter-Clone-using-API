@@ -1,14 +1,14 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
-import { Button, Col, Dropdown, Row } from "react-bootstrap";
+import { Button, Col, Dropdown, DropdownButton, Row } from "react-bootstrap";
 import DeletePostModal from "./DeletePostModal";
 import UpdatePostModal from "./UpdatePostModal";
 
-export default function ProfilePostCard({ post, userDetails }) {
+export default function ProfilePostCard({ post }) {
   const pic = "https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg";
-  const BASE_URL = "https://b8b50c4b-de8f-426c-ad74-875a697d35e4-00-ppgcvyyh91fa.teams.replit.dev";
 
+  const [userDetails, setUserDetails] = useState(null);
   const [likes, setLikes] = useState([]);
   const [postCreatedAt, setPostCreatedAt] = useState("");
   const [modal, setModal] = useState("");
@@ -29,7 +29,12 @@ export default function ProfilePostCard({ post, userDetails }) {
   const userId = decode.id;
 
   useEffect(() => {
-    fetch(`${BASE_URL}/likes/post/${post.id}`)
+    fetch(`${process.env.BASE_URL}/profile/${post.user_id}`)
+      .then((res) => res.json())
+      .then((data) => setUserDetails(data))
+      .catch((error) => console.error("Error: ", error));
+
+    fetch(`${process.env.BASE_URL}/likes/post/${post.id}`)
       .then((res) => res.json())
       .then((data) => setLikes(data))
       .catch((error) => console.error("Error: ", error));
@@ -73,7 +78,7 @@ export default function ProfilePostCard({ post, userDetails }) {
   const handleLike = () => (isLiked ? removeFromLikes() : addToLikes());
 
   const addToLikes = () => {
-    axios.post(`${BASE_URL}/likes`, {
+    axios.post(`${process.env.BASE_URL}/likes`, {
       user_id: userId,
       post_id: post.id,
     })
@@ -88,7 +93,7 @@ export default function ProfilePostCard({ post, userDetails }) {
 
     if (like) {
       axios
-        .put(`${BASE_URL}/likes/${userId}/${post.id}`) // Include userId and postId in the URL
+        .put(`${process.env.BASE_URL}/likes/${userId}/${post.id}`) // Include userId and postId in the URL
         .then(() => {
           // Update the state to reflect the removal of the like
           setLikes(likes.filter((likeItem) => likeItem.user_id !== userId));
@@ -110,7 +115,7 @@ export default function ProfilePostCard({ post, userDetails }) {
           <div className="rounded-circle mx-auto" style={{
             backgroundBlendMode: "multiply",
             backgroundColor: "#ccc",
-            backgroundImage: userDetails && userDetails.profileImage && `url(${BASE_URL}/${userDetails.profileImage})`,
+            backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
@@ -128,16 +133,15 @@ export default function ProfilePostCard({ post, userDetails }) {
                 @{userDetails && userDetails.username ? userDetails.username : userDetails && userDetails.email.split("@")[0]} • {postCreatedAt}
               </span>
             </p>
-            <Dropdown align="end">
-              <Dropdown.Toggle variant="light">
-                <i className="bi bi-three-dots"></i>
-              </Dropdown.Toggle>
 
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => handleShow("edit")}>Edit</Dropdown.Item>
-                <Dropdown.Item onClick={() => handleShow("delete")}>Delete</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+            <DropdownButton variant="light" title={<i className="bi bi-three-dots"></i>} disabled={post.user_id !== userId}>
+              {post.user_id === userId && (
+                <>
+                  <Dropdown.Item onClick={() => handleShow("edit")}>Edit</Dropdown.Item>
+                  <Dropdown.Item onClick={() => handleShow("delete")}>Delete</Dropdown.Item>
+                </>
+              )}
+            </DropdownButton>
           </div>
           <p>{post.content}</p>
           <div className="d-flex justify-content-between">
@@ -170,7 +174,7 @@ export default function ProfilePostCard({ post, userDetails }) {
           handleClose={handleClose}
           userId={userId}
           post={post}
-          BASE_URL={BASE_URL}
+          BASE_URL={process.env.BASE_URL}
         />
       ) : (
         <DeletePostModal
@@ -178,7 +182,7 @@ export default function ProfilePostCard({ post, userDetails }) {
           handleClose={handleClose}
           userId={userId}
           postId={post.id}
-          BASE_URL={BASE_URL}
+          BASE_URL={process.env.BASE_URL}
         />
       )}
     </>

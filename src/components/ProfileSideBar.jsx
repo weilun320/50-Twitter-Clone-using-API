@@ -19,7 +19,7 @@ export default function ProfileSideBar({ handleLogout }) {
     >
       <IconButton className="bi bi-twitter" isTop />
       <IconButton className="bi bi-house" text="Home" />
-      <IconButton className="bi bi-search" text="Explore" />
+      <IconButton className="bi bi-search" text="Explore" onClick={() => navigate("/search")} />
       <IconButton className="bi bi-bell" text="Notifications" />
       <IconButton className="bi bi-envelope" text="Messages" />
       <IconButton className="bi bi-journal-text" text="Lists" />
