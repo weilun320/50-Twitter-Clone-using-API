@@ -142,7 +142,7 @@ export default function ProfileMidBody() {
           <Spinner animation="border" className="ms-3 mt-3" variant="primary" />
         )}
         {posts.length > 0 && posts.map((post) => (
-          <ProfilePostCard key={post.id} post={post} />
+          <ProfilePostCard key={post.id} post={post} clickable={true} />
         ))}
       </Col>
       <ProfileEditModal show={show} handleClose={handleClose} userDetails={userDetails} />

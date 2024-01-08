@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import UsersToFollowPage from "./pages/UsersToFollowPage";
 import "./App.css";
 import SearchPage from "./pages/SearchPage";
+import SinglePostPage from "./pages/SinglePostPage";
 
 export function Layout() {
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");
@@ -52,6 +53,7 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/connect_people" element={<UsersToFollowPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/post/:postId" element={<SinglePostPage />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="*" element={<AuthPage />} />
           </Route>

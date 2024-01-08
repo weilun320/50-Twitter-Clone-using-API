@@ -33,7 +33,7 @@ export default function SearchPage() {
         />
       </InputGroup>
       {posts.length > 0 && posts.map((post) => (
-        <ProfilePostCard key={post.id} post={post} />
+        <ProfilePostCard key={post.id} post={post} clickable={true} />
       ))}
     </Col>
   );
