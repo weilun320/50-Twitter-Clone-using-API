@@ -66,7 +66,7 @@ export default function ProfileMidBody() {
         <div className="position-relative w-100" style={{
           backgroundBlendMode: "multiply",
           backgroundColor: "#ccc",
-          backgroundImage: userDetails && userDetails.bannerImage && `url(${process.env.BASE_URL}/${userDetails.bannerImage})`,
+          backgroundImage: userDetails && userDetails.bannerImage && `url(${process.env.BASE_URL}/${userDetails.bannerImage.replace(/\\/g, "/")})`,
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
@@ -77,7 +77,7 @@ export default function ProfileMidBody() {
         <div className="position-absolute rounded-circle" style={{
           backgroundBlendMode: "multiply",
           backgroundColor: "#ccc",
-          backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage})`,
+          backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
