@@ -184,7 +184,7 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
           <div className="position-relative w-100" style={{
             backgroundBlendMode: "multiply",
             backgroundColor: "#ccc",
-            backgroundImage: bannerImage && isBannerImageUploaded ? bannerImage && `url(${bannerImage})` : userDetails && userDetails.bannerImage && `url(${process.env.BASE_URL}/${bannerImage})`,
+            backgroundImage: bannerImage && isBannerImageUploaded ? bannerImage && `url(${bannerImage})` : userDetails && userDetails.bannerImage && `url(${process.env.BASE_URL}/${bannerImage.replace(/\\/g, "/")})`,
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
@@ -210,7 +210,7 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
             <div className="position-absolute rounded-circle" style={{
               backgroundBlendMode: "multiply",
               backgroundColor: "#ccc",
-              backgroundImage: profileImage && isProfileImageUploaded ? profileImage && `url(${profileImage})` : userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${profileImage})`,
+              backgroundImage: profileImage && isProfileImageUploaded ? profileImage && `url(${profileImage})` : userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${profileImage.replace(/\\/g, "/")})`,
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
               backgroundSize: "cover",
