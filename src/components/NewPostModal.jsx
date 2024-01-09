@@ -28,6 +28,7 @@ export default function NewPostModal({ show, handleClose }) {
                 as="textarea"
                 onChange={(e) => setPostContent(e.target.value)}
                 placeholder="What is happening?!"
+                style={{ height: 100, resize: "none" }}
                 rows={3}
               />
             </Form.Group>

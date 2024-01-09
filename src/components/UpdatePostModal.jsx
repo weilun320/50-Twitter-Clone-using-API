@@ -16,6 +16,10 @@ export default function UpdatePostModal({ show, handleClose, userId, post, BASE_
   }, [post]);
 
   const handleUpdatePost = () => {
+    if (!postContent) {
+      return;
+    }
+
     setLoading(true);
 
     axios.put(`${BASE_URL}/posts/${post.id}`, { ...post, content: postContent })
@@ -32,7 +36,7 @@ export default function UpdatePostModal({ show, handleClose, userId, post, BASE_
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Update post</Modal.Title>
       </Modal.Header>
@@ -43,6 +47,7 @@ export default function UpdatePostModal({ show, handleClose, userId, post, BASE_
               as="textarea"
               onChange={(e) => setPostContent(e.target.value)}
               placeholder="What is happening?!"
+              style={{ height: 100, resize: "none" }}
               value={postContent}
             />
           </Form.Group>
