@@ -4,7 +4,7 @@ import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { fetchPostsByUser } from "../features/posts/postsSlice";
 
-export default function UpdatePostModal({ show, handleClose, userId, post, BASE_URL }) {
+export default function UpdatePostModal({ show, handleClose, userId, post }) {
   const [postContent, setPostContent] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ export default function UpdatePostModal({ show, handleClose, userId, post, BASE_
 
     setLoading(true);
 
-    axios.put(`${BASE_URL}/posts/${post.id}`, { ...post, content: postContent })
+    axios.put(`${process.env.BASE_URL}/posts/${post.id}`, { ...post, content: postContent })
       .then((res) => {
         console.log(res.data);
         dispatch(fetchPostsByUser(userId));

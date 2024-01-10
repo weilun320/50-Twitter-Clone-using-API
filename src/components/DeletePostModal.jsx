@@ -3,11 +3,11 @@ import { Button, Modal } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { fetchPostsByUser } from "../features/posts/postsSlice";
 
-export default function DeletePostModal({ show, handleClose, userId, postId, BASE_URL }) {
+export default function DeletePostModal({ show, handleClose, userId, postId }) {
   const dispatch = useDispatch();
 
   const handleDeletePost = () => {
-    axios.delete(`${BASE_URL}/posts/${postId}`)
+    axios.delete(`${process.env.BASE_URL}/posts/${postId}`)
       .then((res) => {
         console.log(res.data);
         dispatch(fetchPostsByUser(userId));
