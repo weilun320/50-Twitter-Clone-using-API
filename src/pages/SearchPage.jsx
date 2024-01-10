@@ -3,18 +3,27 @@ import { Col, Form, InputGroup } from "react-bootstrap";
 import ProfilePostCard from "../components/ProfilePostCard";
 
 export default function SearchPage() {
-
   const [keyword, setKeyword] = useState("");
   const [posts, setPosts] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSearch = () => {
+    setErrorMessage("");
+    setPosts([]);
+
     if (!keyword) {
       return;
     }
 
     fetch(`${process.env.BASE_URL}/search/${keyword}`)
-      .then((res) => res.json())
-      .then((data) => setPosts(data))
+      .then((res) => {
+        if (res.ok) {
+          return res.json().then((data) => setPosts(data));
+        }
+        else {
+          return res.json().then((data) => setErrorMessage(data.error));
+        }
+      })
       .catch((error) => console.error("Error: ", error));
   };
 
@@ -32,6 +41,7 @@ export default function SearchPage() {
           value={keyword}
         />
       </InputGroup>
+      {errorMessage && <p>{errorMessage}</p>}
       {posts.length > 0 && posts.map((post) => (
         <ProfilePostCard key={post.id} post={post} clickable={true} />
       ))}
