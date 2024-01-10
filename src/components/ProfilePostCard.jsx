@@ -5,6 +5,7 @@ import { Button, Col, Dropdown, DropdownButton, Row } from "react-bootstrap";
 import DeletePostModal from "./DeletePostModal";
 import UpdatePostModal from "./UpdatePostModal";
 import { useNavigate } from "react-router-dom";
+import NewCommentModal from "./NewCommentModal";
 
 export default function ProfilePostCard({ post, clickable }) {
   const pic = "https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg";
@@ -13,6 +14,7 @@ export default function ProfilePostCard({ post, clickable }) {
   const [likes, setLikes] = useState([]);
   const [postCreatedAt, setPostCreatedAt] = useState("");
   const [modal, setModal] = useState("");
+  const [comments, setComments] = useState([]);
 
   const [show, setShow] = useState(false);
   const handleClose = () => {
@@ -38,6 +40,11 @@ export default function ProfilePostCard({ post, clickable }) {
     fetch(`${process.env.BASE_URL}/likes/post/${post.id}`)
       .then((res) => res.json())
       .then((data) => setLikes(data))
+      .catch((error) => console.error("Error: ", error));
+
+    fetch(`${process.env.BASE_URL}/comments/post/${post.id}`)
+      .then((res) => res.json())
+      .then((data) => setComments(data))
       .catch((error) => console.error("Error: ", error));
 
     const getPostCreatedTime = () => {
@@ -162,7 +169,9 @@ export default function ProfilePostCard({ post, clickable }) {
                 </div>
                 <div className="ms-3">
                   <div>
-                    <strong>{userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}</strong>
+                    <strong>
+                      {userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}
+                    </strong>
                   </div>
                   <div>
                     <span className="text-secondary">
@@ -172,7 +181,12 @@ export default function ProfilePostCard({ post, clickable }) {
                   </div>
                 </div>
               </div>
-              <DropdownButton variant="light" title={<i className="bi bi-three-dots"></i>} disabled={post.user_id !== userId}>
+              <DropdownButton
+                variant="light"
+                title={<i className="bi bi-three-dots"></i>}
+                disabled={post.user_id !== userId}
+                onClick={(e) => e.stopPropagation()}
+              >
                 {post.user_id === userId && (
                   <>
                     <Dropdown.Item onClick={() => handleShow("edit")}>Edit</Dropdown.Item>
@@ -187,14 +201,21 @@ export default function ProfilePostCard({ post, clickable }) {
             {clickable && (
               <div className="d-flex justify-content-between align-items-center">
                 <p className="mb-0">
-                  <strong>{userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}</strong>
+                  <strong>
+                    {userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}
+                  </strong>
                   <span className="text-secondary ms-1">
                     @{userDetails && userDetails.username ? userDetails.username : userDetails && userDetails.email.split("@")[0]}
                     {clickable && ` • ${postCreatedAt}`}
                   </span>
                 </p>
 
-                <DropdownButton variant="light" title={<i className="bi bi-three-dots"></i>} disabled={post.user_id !== userId}>
+                <DropdownButton
+                  variant="light"
+                  title={<i className="bi bi-three-dots"></i>}
+                  disabled={post.user_id !== userId}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {post.user_id === userId && (
                     <>
                       <Dropdown.Item onClick={() => handleShow("edit")}>Edit</Dropdown.Item>
@@ -209,13 +230,24 @@ export default function ProfilePostCard({ post, clickable }) {
               <p className="text-secondary" style={{ fontSize: 14 }}>{postCreatedAt}</p>
             }
             <div className="d-flex justify-content-between">
-              <Button variant="light">
-                <i className="bi bi-chat"></i>
+              <Button
+                variant="light"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShow("comment");
+                }}>
+                <i className="bi bi-chat me-2"></i>
+                {comments.length}
               </Button>
               <Button variant="light">
                 <i className="bi bi-repeat"></i>
               </Button>
-              <Button variant="light" onClick={handleLike}>
+              <Button
+                variant="light"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike();
+                }}>
                 {isLiked ? (
                   <i className="bi bi-heart-fill text-danger me-2"></i>
                 ) : (
@@ -240,15 +272,23 @@ export default function ProfilePostCard({ post, clickable }) {
           handleClose={handleClose}
           userId={userId}
           post={post}
-          BASE_URL={process.env.BASE_URL}
         />
-      ) : (
+      ) : modal === "delete" ? (
         <DeletePostModal
           show={show}
           handleClose={handleClose}
           userId={userId}
           postId={post.id}
-          BASE_URL={process.env.BASE_URL}
+        />
+      ) : (
+        <NewCommentModal
+          show={show}
+          handleClose={handleClose}
+          userDetails={userDetails}
+          userId={userId}
+          post={post}
+          comments={comments}
+          setComments={setComments}
         />
       )}
     </>
