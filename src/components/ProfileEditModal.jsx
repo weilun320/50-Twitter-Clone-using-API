@@ -181,13 +181,8 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
           </Button>
         </Modal.Header>
         <Modal.Body>
-          <div className="position-relative w-100" style={{
-            backgroundBlendMode: "multiply",
-            backgroundColor: "#ccc",
-            backgroundImage: bannerImage && isBannerImageUploaded ? bannerImage && `url(${bannerImage})` : userDetails && userDetails.bannerImage && `url(${process.env.BASE_URL}/${bannerImage.replace(/\\/g, "/")})`,
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
+          <div className="position-relative w-100 default-image-container" style={{
+            backgroundImage: bannerImage && isBannerImageUploaded ? bannerImage && `url(${bannerImage})` : userDetails && userDetails.bannerImage && bannerImage && `url(${process.env.BASE_URL}/${bannerImage.replace(/\\/g, "/")})`,
             height: 150,
           }}>
             <div className="position-absolute top-50 start-50 translate-middle">
@@ -207,13 +202,8 @@ export default function ProfileEditModal({ show, handleClose, userDetails }) {
                 <i className="bi bi-camera"></i>
               </Button>
             </div>
-            <div className="position-absolute rounded-circle" style={{
-              backgroundBlendMode: "multiply",
-              backgroundColor: "#ccc",
-              backgroundImage: profileImage && isProfileImageUploaded ? profileImage && `url(${profileImage})` : userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${profileImage.replace(/\\/g, "/")})`,
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "cover",
+            <div className="position-absolute rounded-circle default-image-container" style={{
+              backgroundImage: profileImage && isProfileImageUploaded ? profileImage && `url(${profileImage})` : userDetails && userDetails.profileImage && profileImage && `url(${process.env.BASE_URL}/${profileImage.replace(/\\/g, "/")})`,
               border: "3px solid #F8F9FA",
               height: 100,
               marginLeft: 14,

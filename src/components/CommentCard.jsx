@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { Button, Col, Dropdown, DropdownButton, Row } from "react-bootstrap";
 import DeleteCommentModal from "./DeleteCommentModal";
 import UpdateCommentModal from "./UpdateCommentModal";
+import { useNavigate } from "react-router-dom";
 
 export default function CommentCard({ userId, comment, postId }) {
   const [userDetails, setUserDetails] = useState(null);
   const [commentCreatedAt, setCommentCreatedAt] = useState("");
   const [modal, setModal] = useState("");
+
+  const navigate = useNavigate();
 
   const [show, setShow] = useState(false);
   const handleClose = () => {
@@ -54,6 +57,15 @@ export default function CommentCard({ userId, comment, postId }) {
     getCommentCreatedTime();
   }, [comment]);
 
+  const handleNavigateUser = (currentUserId) => {
+    if (currentUserId !== userId) {
+      navigate(`/profile/${currentUserId}`);
+    }
+    else {
+      navigate("/profile");
+    }
+  };
+
   return (
     <>
       <Row
@@ -64,29 +76,42 @@ export default function CommentCard({ userId, comment, postId }) {
         }}
       >
         <Col sm={1} className="px-0">
-          <div className="rounded-circle mx-auto" style={{
-            backgroundBlendMode: "multiply",
-            backgroundColor: "#ccc",
-            backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            height: 40,
-            width: 40,
-          }}>
+          <div
+            className="rounded-circle mx-auto default-image-container active"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigateUser(comment.user_id);
+            }}
+            style={{
+              backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
+              height: 40,
+              width: 40,
+            }}>
           </div>
         </Col>
 
         <Col>
           <div className="d-flex justify-content-between align-items-center">
             <p className="mb-0">
-              <strong>
+              <strong
+                className="link active"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNavigateUser(comment.user_id);
+                }}
+              >
                 {userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}
               </strong>
-              <span className="text-secondary ms-1">
+              <span
+                className="text-secondary ms-1 link"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNavigateUser(comment.user_id);
+                }}
+              >
                 @{userDetails && userDetails.username ? userDetails.username : userDetails && userDetails.email.split("@")[0]}
-                {` • ${commentCreatedAt}`}
               </span>
+              <span className="text-secondary">{` • ${commentCreatedAt}`}</span>
             </p>
 
             <DropdownButton

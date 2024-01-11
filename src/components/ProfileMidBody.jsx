@@ -2,14 +2,13 @@ import { Button, Col, Nav, Row, Spinner } from "react-bootstrap";
 import ProfilePostCard from "./ProfilePostCard";
 import ProfileEditModal from "./ProfileEditModal";
 import { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPostsByUser } from "../features/posts/postsSlice";
 import { fetchUserDetails } from "../features/users/usersSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function ProfileMidBody() {
+export default function ProfileMidBody({ userId, currentUserId }) {
   const url = "https://pbs.twimg.com/profile_banners/83072625/1602845571/1500x500";
   const pic = "https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg";
 
@@ -25,62 +24,77 @@ export default function ProfileMidBody() {
 
   const [follower, setFollower] = useState(0);
   const [following, setFollowing] = useState(0);
+  const [isFollowed, setIsFollowed] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    dispatch(fetchPostsByUser(userId));
+    dispatch(fetchUserDetails(userId));
 
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    else {
+    const fetchFollowers = async () => {
       try {
-        const decodedToken = jwtDecode(token);
-        const userId = decodedToken.id;
-        dispatch(fetchPostsByUser(userId));
-        dispatch(fetchUserDetails(userId));
+        const res = await axios.get(`${process.env.BASE_URL}/follows/count/${userId}`);
 
-        const fetchFollowers = async () => {
-          try {
-            const res = await axios.get(`${process.env.BASE_URL}/follows/count/${userId}`);
-
-            setFollower(res.data.follower);
-            setFollowing(res.data.following);
-          } catch (error) {
-            console.error(error);
-          }
-        };
-
-        fetchFollowers();
+        setFollower(res.data.follower);
+        setFollowing(res.data.following);
       } catch (error) {
-        navigate("/login");
+        console.error(error);
       }
+    };
+
+    const setIsFollowedState = async () => {
+      fetch(`${process.env.BASE_URL}/follows/${currentUserId}/${userId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setIsFollowed(data.following);
+        })
+        .catch((error) => console.error("Error: ", error));
+    };
+
+    fetchFollowers();
+
+    if (userId !== currentUserId) {
+      setIsFollowedState();
     }
-  }, [dispatch, navigate]);
+  }, [currentUserId, dispatch, navigate, userId]);
+
+  const handleFollow = () => isFollowed ? removeFromFollows() : addToFollows();
+
+  const addToFollows = () => {
+    axios.post(`${process.env.BASE_URL}/follows`, {
+      user_id: currentUserId,
+      following_user_id: userId,
+    })
+      .then(() => {
+        setIsFollowed(true);
+        setFollower((prevFollower) => prevFollower + 1);
+      })
+      .catch((error) => console.error("Error: ", error));
+  };
+
+  const removeFromFollows = () => {
+    if (isFollowed) {
+      axios.put(`${process.env.BASE_URL}/follows/${currentUserId}/${userId}`)
+        .then(() => {
+          setIsFollowed(false);
+          setFollower((prevFollower) => prevFollower - 1);
+        })
+        .catch((error) => console.error("Error: ", error));
+    }
+  };
 
   return (
     <>
       <Col sm={6} className="bg-light" style={{ border: "1px solid lightgrey" }}>
-        <div className="position-relative w-100" style={{
-          backgroundBlendMode: "multiply",
-          backgroundColor: "#ccc",
+        <div className="position-relative w-100 default-image-container" style={{
           backgroundImage: userDetails && userDetails.bannerImage && `url(${process.env.BASE_URL}/${userDetails.bannerImage.replace(/\\/g, "/")})`,
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
           height: 180,
         }}>
         </div>
         <br />
-        <div className="position-absolute rounded-circle" style={{
-          backgroundBlendMode: "multiply",
-          backgroundColor: "#ccc",
+        <div className="position-absolute rounded-circle default-image-container" style={{
           backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
           border: "4px solid #F8F9FA",
           height: 150,
           marginLeft: 15,
@@ -91,13 +105,34 @@ export default function ProfileMidBody() {
 
         <Row className="justify-content-end">
           <Col xs="auto">
-            <Button
-              className="rounded-pill mt-2"
-              variant="outline-secondary"
-              onClick={handleShow}
-            >
-              Edit Profile
-            </Button>
+            {userId === currentUserId ? (
+              <Button
+                className="rounded-pill mt-2"
+                variant="outline-secondary"
+                onClick={handleShow}
+              >
+                Edit Profile
+              </Button>
+            ) : isFollowed ? (
+              <Button
+                className="rounded-pill"
+                variant="outline-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFollow();
+                }}>
+                Unfollow
+              </Button>
+            ) : (
+              <Button
+                className="rounded-pill"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFollow();
+                }}>
+                Follow
+              </Button>
+            )}
           </Col>
         </Row>
 
@@ -145,7 +180,9 @@ export default function ProfileMidBody() {
           <ProfilePostCard key={post.id} post={post} clickable={true} />
         ))}
       </Col>
-      <ProfileEditModal show={show} handleClose={handleClose} userDetails={userDetails} />
+      {userDetails && (
+        <ProfileEditModal show={show} handleClose={handleClose} userDetails={userDetails} />
+      )}
     </>
   );
 }

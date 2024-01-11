@@ -1,3 +1,24 @@
 .dropdown-toggle::after {
   display: none !important;
 }
+
+.default-image-container {
+  background-blend-mode: multiply;
+  background-color: #ccc;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.default-image-container.active:hover {
+  background-color: #b1b1b1;
+  cursor: pointer;
+}
+
+.link {
+  cursor: pointer;
+}
+
+.link.active:hover {
+  text-decoration: underline;
+}

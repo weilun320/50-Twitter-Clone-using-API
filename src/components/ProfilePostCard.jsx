@@ -15,6 +15,7 @@ export default function ProfilePostCard({ post, clickable }) {
   const [postCreatedAt, setPostCreatedAt] = useState("");
   const [modal, setModal] = useState("");
   const [comments, setComments] = useState([]);
+  const [userId, setUserId] = useState(null);
 
   const [show, setShow] = useState(false);
   const handleClose = () => {
@@ -26,12 +27,25 @@ export default function ProfilePostCard({ post, clickable }) {
     setModal(action);
   };
 
-  // Decoding to get the user ID
-  const token = localStorage.getItem("authToken");
-  const decode = jwtDecode(token);
-  const userId = decode.id;
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    else {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUserId(decodedToken.id);
+      } catch (error) {
+        navigate("/login");
+        return;
+      }
+    }
+
     fetch(`${process.env.BASE_URL}/profile/${post.user_id}`)
       .then((res) => res.json())
       .then((data) => setUserDetails(data))
@@ -92,7 +106,7 @@ export default function ProfilePostCard({ post, clickable }) {
     const intervalId = setInterval(getPostCreatedTime, 60000);
 
     return () => clearInterval(intervalId);
-  }, [clickable, post]);
+  }, [clickable, navigate, post]);
 
   const isLiked = likes.some((like) => like.user_id === userId);
 
@@ -121,17 +135,24 @@ export default function ProfilePostCard({ post, clickable }) {
         })
         .catch((error) => console.error("Error: ", error));
     }
+  }
+
+  const handleNavigatePost = () => {
+    navigate(`/post/${post.id}`);
   };
 
-  const navigate = useNavigate();
-
-  const handleNavigate = () => {
-    navigate(`/post/${post.id}`, { state: { post, userId } });
-  }
+  const handleNavigateUser = (currentUserId) => {
+    if (currentUserId !== userId) {
+      navigate(`/profile/${currentUserId}`);
+    }
+    else {
+      navigate("/profile");
+    }
+  };
 
   return (
     <>
-      <div style={{ cursor: clickable && "pointer" }} onClick={clickable ? handleNavigate : null}>
+      <div style={{ cursor: clickable && "pointer" }} onClick={clickable ? handleNavigatePost : null}>
         <Row
           className="p-3"
           style={{
@@ -141,42 +162,55 @@ export default function ProfilePostCard({ post, clickable }) {
         >
           {clickable ? (
             <Col sm={1} className="px-0">
-              <div className="rounded-circle mx-auto" style={{
-                backgroundBlendMode: "multiply",
-                backgroundColor: "#ccc",
-                backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-                height: 40,
-                width: 40,
-              }}>
+              <div
+                className="rounded-circle mx-auto default-image-container active"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNavigateUser(post.user_id);
+                }}
+                style={{
+                  backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
+                  height: 40,
+                  width: 40,
+                }}>
               </div>
             </Col>
           ) : (
             <Col sm={12} className="d-flex justify-content-between align-items-center">
               <div className="d-flex">
-                <div className="rounded-circle" style={{
-                  backgroundBlendMode: "multiply",
-                  backgroundColor: "#ccc",
-                  backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  backgroundSize: "cover",
-                  height: 40,
-                  width: 40,
-                }}>
+                <div
+                  className="rounded-circle default-image-container active"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNavigateUser(post.user_id);
+                  }}
+                  style={{
+                    backgroundImage: userDetails && userDetails.profileImage && `url(${process.env.BASE_URL}/${userDetails.profileImage.replace(/\\/g, "/")})`,
+                    height: 40,
+                    width: 40,
+                  }}>
                 </div>
                 <div className="ms-3">
-                  <div>
+                  <div
+                    className="link active"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNavigateUser(post.user_id);
+                    }}
+                  >
                     <strong>
                       {userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}
                     </strong>
                   </div>
-                  <div>
+                  <div
+                    className="link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNavigateUser(post.user_id);
+                    }}
+                  >
                     <span className="text-secondary">
                       @{userDetails && userDetails.username ? userDetails.username : userDetails && userDetails.email.split("@")[0]}
-                      {clickable && ` • ${postCreatedAt}`}
                     </span>
                   </div>
                 </div>
@@ -201,13 +235,25 @@ export default function ProfilePostCard({ post, clickable }) {
             {clickable && (
               <div className="d-flex justify-content-between align-items-center">
                 <p className="mb-0">
-                  <strong>
+                  <strong
+                    className="link active"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNavigateUser(post.user_id);
+                    }}
+                  >
                     {userDetails && userDetails.name ? userDetails.name : userDetails && userDetails.email.split("@")[0]}
                   </strong>
-                  <span className="text-secondary ms-1">
+                  <span
+                    className="text-secondary ms-1 link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNavigateUser(post.user_id);
+                    }}
+                  >
                     @{userDetails && userDetails.username ? userDetails.username : userDetails && userDetails.email.split("@")[0]}
-                    {clickable && ` • ${postCreatedAt}`}
                   </span>
+                  {clickable && <span className="text-secondary">{` • ${postCreatedAt}`}</span>}
                 </p>
 
                 <DropdownButton
@@ -280,7 +326,7 @@ export default function ProfilePostCard({ post, clickable }) {
           userId={userId}
           postId={post.id}
         />
-      ) : (
+      ) : modal === "comment" ? (
         <NewCommentModal
           show={show}
           handleClose={handleClose}
@@ -290,7 +336,7 @@ export default function ProfilePostCard({ post, clickable }) {
           comments={comments}
           setComments={setComments}
         />
-      )}
+      ) : null}
     </>
   );
 }
