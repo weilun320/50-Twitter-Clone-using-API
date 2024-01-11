@@ -135,7 +135,7 @@ export default function ProfilePostCard({ post, clickable }) {
         })
         .catch((error) => console.error("Error: ", error));
     }
-  }
+  };
 
   const handleNavigatePost = () => {
     navigate(`/post/${post.id}`);
@@ -293,7 +293,8 @@ export default function ProfilePostCard({ post, clickable }) {
                 onClick={(e) => {
                   e.stopPropagation();
                   handleLike();
-                }}>
+                }}
+              >
                 {isLiked ? (
                   <i className="bi bi-heart-fill text-danger me-2"></i>
                 ) : (

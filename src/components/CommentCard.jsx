@@ -3,11 +3,13 @@ import { Button, Col, Dropdown, DropdownButton, Row } from "react-bootstrap";
 import DeleteCommentModal from "./DeleteCommentModal";
 import UpdateCommentModal from "./UpdateCommentModal";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function CommentCard({ userId, comment, postId }) {
   const [userDetails, setUserDetails] = useState(null);
   const [commentCreatedAt, setCommentCreatedAt] = useState("");
   const [modal, setModal] = useState("");
+  const [likes, setLikes] = useState([]);
 
   const navigate = useNavigate();
 
@@ -25,6 +27,11 @@ export default function CommentCard({ userId, comment, postId }) {
     fetch(`${process.env.BASE_URL}/profile/${comment.user_id}`)
       .then((res) => res.json())
       .then((data) => setUserDetails(data))
+      .catch((error) => console.error("Error: ", error));
+
+    fetch(`${process.env.BASE_URL}/comment_likes/comment/${comment.id}`)
+      .then((res) => res.json())
+      .then((data) => setLikes(data))
       .catch((error) => console.error("Error: ", error));
 
     const getCommentCreatedTime = () => {
@@ -56,6 +63,35 @@ export default function CommentCard({ userId, comment, postId }) {
 
     getCommentCreatedTime();
   }, [comment]);
+
+  const isLiked = likes.some((like) => like.user_id === userId);
+
+  const handleLike = () => (isLiked ? removeFromLikes() : addToLikes());
+
+  const addToLikes = () => {
+    axios.post(`${process.env.BASE_URL}/comment_likes`, {
+      user_id: userId,
+      comment_id: comment.id,
+    })
+      .then((res) => {
+        setLikes([...likes, { ...res.data, comment_likes_id: res.data.id }]);
+      })
+      .catch((error) => console.error("Error: ", error));
+  };
+
+  const removeFromLikes = () => {
+    const like = likes.find((like) => like.user_id === userId);
+
+    if (like) {
+      axios
+        .put(`${process.env.BASE_URL}/comment_likes/${userId}/${comment.id}`) // Include userId and postId in the URL
+        .then(() => {
+          // Update the state to reflect the removal of the like
+          setLikes(likes.filter((likeItem) => likeItem.user_id !== userId));
+        })
+        .catch((error) => console.error("Error: ", error));
+    }
+  }
 
   const handleNavigateUser = (currentUserId) => {
     if (currentUserId !== userId) {
@@ -132,17 +168,27 @@ export default function CommentCard({ userId, comment, postId }) {
           <div className="d-flex justify-content-between">
             <Button
               variant="light">
-              <i className="bi bi-chat me-2"></i>
+              <i className="bi bi-chat"></i>
             </Button>
             <Button variant="light">
               <i className="bi bi-repeat"></i>
             </Button>
             <Button
-              variant="light">
-              <i className="bi bi-heart me-2"></i>
+              variant="light"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLike();
+              }}
+            >
+              {isLiked ? (
+                <i className="bi bi-heart-fill text-danger me-2"></i>
+              ) : (
+                <i className="bi bi-heart me-2"></i>
+              )}
+              {likes.length}
             </Button>
             <Button variant="light">
-              <i className="bi bi-graph-up me-2"></i>
+              <i className="bi bi-graph-up"></i>
             </Button>
             <Button variant="light">
               <i className="bi bi-upload"></i>
