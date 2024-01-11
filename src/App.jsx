@@ -11,6 +11,7 @@ import UsersToFollowPage from "./pages/UsersToFollowPage";
 import "./App.css";
 import SearchPage from "./pages/SearchPage";
 import SinglePostPage from "./pages/SinglePostPage";
+import UsersToFollowSection from "./components/UsersToFollowSection";
 
 export function Layout() {
   const [authToken, setAuthToken] = useLocalStorage("authToken", "");
@@ -34,6 +35,9 @@ export function Layout() {
           <Row>
             <ProfileSideBar handleLogout={handleLogout} />
             <Outlet />
+            {window.location.pathname !== "/connect_people" &&
+              <UsersToFollowSection />
+            }
           </Row>
         </Container>
       ) : (
@@ -51,6 +55,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/profile" />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
             <Route path="/connect_people" element={<UsersToFollowPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/post/:postId" element={<SinglePostPage />} />
