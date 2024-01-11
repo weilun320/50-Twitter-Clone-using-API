@@ -7,7 +7,7 @@ export default function SearchPage() {
   const [posts, setPosts] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSearch = () => {
+  const handleSearchPost = () => {
     setErrorMessage("");
     setPosts([]);
 
@@ -15,7 +15,7 @@ export default function SearchPage() {
       return;
     }
 
-    fetch(`${process.env.BASE_URL}/search/${keyword}`)
+    fetch(`${process.env.BASE_URL}/search/posts/${keyword}`)
       .then((res) => {
         if (res.ok) {
           return res.json().then((data) => setPosts(data));
@@ -35,7 +35,7 @@ export default function SearchPage() {
         </InputGroup.Text>
         <Form.Control
           onChange={(e) => setKeyword(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" ? handleSearch() : null}
+          onKeyDown={(e) => e.key === "Enter" ? handleSearchPost() : null}
           placeholder="Search"
           type="text"
           value={keyword}
