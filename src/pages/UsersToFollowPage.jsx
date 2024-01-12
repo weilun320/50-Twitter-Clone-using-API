@@ -81,8 +81,9 @@ export default function UsersToFollowPage() {
         </InputGroup>
         {errorMessage && <p>{errorMessage}</p>}
         {notFollowing && notFollowing.length > 0 && notFollowing.map((user) =>
-          <UsersToFollowCard key={user.id} userId={user.id} currentUserId={currentUserId} />
-        )}
+          user.id !== currentUserId && (
+            <UsersToFollowCard key={user.id} userId={user.id} currentUserId={currentUserId} />
+          ))}
       </Col>
     </>
   );

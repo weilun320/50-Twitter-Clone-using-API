@@ -55,6 +55,9 @@ export default function SinglePostPage() {
                   })
                   .catch((error) => console.error("Error: ", error));
               }
+              else {
+                setViews(data.views);
+              }
             });
           }
           else {
