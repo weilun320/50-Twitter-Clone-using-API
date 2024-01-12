@@ -8,5 +8,6 @@ export default defineConfig({
   plugins: [react()],
   define: {
     "process.env": process.env
-  }
+  },
+  base: "/50-Twitter-Clone-using-API/"
 })

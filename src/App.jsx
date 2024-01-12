@@ -50,7 +50,7 @@ export function Layout() {
 function App() {
   return (
     <Provider store={store}>
-      <BrowserRouter>
+      <BrowserRouter basename="/50-Twitter-Clone-using-API/">
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/profile" />} />
